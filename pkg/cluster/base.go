@@ -7,6 +7,7 @@ import (
 	"github.com/banzaicloud/pipeline/pkg/cluster/amazon"
 	"github.com/banzaicloud/pipeline/pkg/cluster/azure"
 	"github.com/banzaicloud/pipeline/pkg/cluster/dummy"
+	"github.com/banzaicloud/pipeline/pkg/cluster/eks"
 	"github.com/banzaicloud/pipeline/pkg/cluster/google"
 	"github.com/banzaicloud/pipeline/pkg/cluster/kubernetes"
 	pkgCommon "github.com/banzaicloud/pipeline/pkg/common"
@@ -31,6 +32,7 @@ const (
 // Cluster provider constants
 const (
 	Amazon     = "amazon"
+	Eks        = "eks"
 	Azure      = "azure"
 	Google     = "google"
 	Dummy      = "dummy"
@@ -78,6 +80,7 @@ type CreateClusterRequest struct {
 	PostHooks   PostHooks `json:"postHooks"`
 	Properties  struct {
 		CreateClusterAmazon *amazon.CreateClusterAmazon  `json:"amazon,omitempty"`
+		CreateClusterEks    *eks.CreateClusterEks        `json:"eks,omitempty"`
 		CreateClusterAzure  *azure.CreateClusterAzure    `json:"azure,omitempty"`
 		CreateClusterGoogle *google.CreateClusterGoogle  `json:"google,omitempty"`
 		CreateClusterDummy  *dummy.CreateClusterDummy    `json:"dummy,omitempty"`
@@ -239,6 +242,8 @@ func (r *CreateClusterRequest) Validate() error {
 	case Oracle:
 		// oracle validate
 		return r.Properties.CreateClusterOracle.Validate(false)
+	case Eks:
+		return r.Properties.CreateClusterEks.Validate()
 	default:
 		// not supported cloud type
 		return pkgErrors.ErrorNotSupportedCloudType
@@ -318,6 +323,7 @@ type ClusterProfileResponse struct {
 	Properties struct {
 		Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
 		Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
+		Eks    *eks.ClusterProfileEks       `json:"eks,omitempty"`
 		Google *google.ClusterProfileGoogle `json:"google,omitempty"`
 		Oracle *oracle.Cluster              `json:"oracle,omitempty"`
 	} `json:"properties" binding:"required"`
@@ -331,6 +337,7 @@ type ClusterProfileRequest struct {
 	Properties struct {
 		Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
 		Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
+		Eks    *eks.ClusterProfileEks       `json:"eks,omitempty"`
 		Google *google.ClusterProfileGoogle `json:"google,omitempty"`
 		Oracle *oracle.Cluster              `json:"oracle,omitempty"`
 	} `json:"properties" binding:"required"`
@@ -459,6 +466,7 @@ func (p *ClusterProfileResponse) CreateClusterRequest(createRequest *CreateClust
 		ProfileName: p.Name,
 		Properties: struct {
 			CreateClusterAmazon *amazon.CreateClusterAmazon  `json:"amazon,omitempty"`
+			CreateClusterEks    *eks.CreateClusterEks        `json:"eks,omitempty"`
 			CreateClusterAzure  *azure.CreateClusterAzure    `json:"azure,omitempty"`
 			CreateClusterGoogle *google.CreateClusterGoogle  `json:"google,omitempty"`
 			CreateClusterDummy  *dummy.CreateClusterDummy    `json:"dummy,omitempty"`
@@ -475,6 +483,14 @@ func (p *ClusterProfileResponse) CreateClusterRequest(createRequest *CreateClust
 				InstanceType: p.Properties.Amazon.Master.InstanceType,
 				Image:        p.Properties.Amazon.Master.Image,
 			},
+		}
+	case Eks:
+		response.Properties.CreateClusterEks = &eks.CreateClusterEks{
+			NodeImageId:      p.Properties.Eks.NodeImageId,
+			NodeInstanceType: p.Properties.Eks.NodeInstanceType,
+			Version:          p.Properties.Eks.Version,
+			NodeMinCount:     p.Properties.Eks.NodeMinCount,
+			NodeMaxCount:     p.Properties.Eks.NodeMaxCount,
 		}
 	case Azure:
 		a := createRequest.Properties.CreateClusterAzure
