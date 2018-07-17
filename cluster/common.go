@@ -286,6 +286,14 @@ func CreateCommonClusterFromRequest(createClusterRequest *pkgCluster.CreateClust
 
 	cloudType := createClusterRequest.Cloud
 	switch cloudType {
+	case pkgCluster.Alibaba:
+		//Create Amazon struct
+		alibabaCluster, err := CreateAlibabaClusterFromRequest(createClusterRequest, orgId)
+		if err != nil {
+			return nil, err
+		}
+		return alibabaCluster, nil
+
 	case pkgCluster.Amazon:
 		//Create Amazon struct
 		awsCluster, err := CreateAWSClusterFromRequest(createClusterRequest, orgId, userId)

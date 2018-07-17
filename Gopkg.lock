@@ -118,6 +118,24 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
+  name = "github.com/aliyun/alibaba-cloud-sdk-go"
+  packages = [
+    "sdk",
+    "sdk/auth",
+    "sdk/auth/credentials",
+    "sdk/auth/signers",
+    "sdk/endpoints",
+    "sdk/errors",
+    "sdk/requests",
+    "sdk/responses",
+    "sdk/utils",
+    "services/cs",
+    "services/ecs"
+  ]
+  revision = "59d358a6968627414637026239c97bd8444d056b"
+  version = "1.23.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/antihax/optional"
   packages = ["."]
@@ -891,6 +909,12 @@
   version = "1.5.0"
 
 [[projects]]
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
@@ -1094,6 +1118,15 @@
   packages = ["."]
   revision = "b5e8006cbee93ec955a89ab31e0e3ce3204f3736"
   version = "v1.0.2"
+
+[[projects]]
+  name = "github.com/stretchr/testify"
+  packages = [
+    "assert",
+    "require"
+  ]
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
 
 [[projects]]
   name = "github.com/technosophos/moniker"
