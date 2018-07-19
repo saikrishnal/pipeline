@@ -121,7 +121,7 @@ const (
 var DefaultRules = map[string]Meta{
 	cluster.Alibaba: {
 		Fields: []FieldMeta{
-			{Name: AlibabaRegion, Required: true},
+			{Name: AlibabaRegion, Required: false},
 			{Name: AlibabaAccessKeyId, Required: true},
 			{Name: AlibabaSecretAccessKey, Required: true},
 		},
