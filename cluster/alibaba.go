@@ -498,7 +498,7 @@ func (c *AlibabaCluster) DeleteCluster() error {
 	}
 
 	req := cs.CreateDeleteClusterRequest()
-	req.ClusterId = c.alibabaCluster.ClusterID
+	req.ClusterId = c.modelCluster.Alibaba.ClusterID
 
 	setEndpoint(req)
 	resp, err := client.DeleteCluster(req)
@@ -529,7 +529,7 @@ func (c *AlibabaCluster) UpdateCluster(request *pkgCluster.UpdateClusterRequest,
 
 	req := cs.CreateScaleClusterRequest()
 
-	req.ClusterId = c.alibabaCluster.ClusterID
+	req.ClusterId = c.modelCluster.Alibaba.ClusterID
 	params := alibabaScaleClusterParams{
 		WorkerInstanceType:       c.modelCluster.Alibaba.NodePools[0].WorkerInstanceType,
 		WorkerSystemDiskCategory: c.modelCluster.Alibaba.NodePools[0].WorkerSystemDiskCategory,
@@ -592,7 +592,7 @@ func (c *AlibabaCluster) GetAPIEndpoint() (string, error) {
 	}
 
 	client, err := c.GetAlibabaCSClient(nil)
-	inf, err := getConnectionInfo(client, c.alibabaCluster.ClusterID)
+	inf, err := getConnectionInfo(client, c.modelCluster.Alibaba.ClusterID)
 	u, err := url.Parse(inf.InternetURI)
 	if err != nil {
 		return "", err
@@ -624,7 +624,7 @@ func (c *AlibabaCluster) GetClusterDetails() (*pkgCluster.DetailsResponse, error
 		return nil, err
 	}
 
-	r, err := getClusterDetails(client, c.alibabaCluster.ClusterID)
+	r, err := getClusterDetails(client, c.modelCluster.Alibaba.ClusterID)
 	if err != nil {
 		return nil, err
 	}
