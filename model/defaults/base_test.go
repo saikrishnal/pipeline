@@ -5,6 +5,7 @@ import (
 
 	"github.com/banzaicloud/pipeline/model/defaults"
 	pkgCluster "github.com/banzaicloud/pipeline/pkg/cluster"
+	"github.com/banzaicloud/pipeline/pkg/cluster/alibaba"
 	"github.com/banzaicloud/pipeline/pkg/cluster/amazon"
 	"github.com/banzaicloud/pipeline/pkg/cluster/azure"
 	"github.com/banzaicloud/pipeline/pkg/cluster/google"
@@ -107,10 +108,11 @@ var (
 		Location: location,
 		Cloud:    pkgCluster.Google,
 		Properties: struct {
-			Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
-			Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
-			Google *google.ClusterProfileGoogle `json:"google,omitempty"`
-			Oracle *oracle.Cluster              `json:"oracle,omitempty"`
+			Alibaba *alibaba.ClusterProfileAlibaba `json:"alibaba,omitempty"`
+			Amazon  *amazon.ClusterProfileAmazon   `json:"amazon,omitempty"`
+			Azure   *azure.ClusterProfileAzure     `json:"azure,omitempty"`
+			Google  *google.ClusterProfileGoogle   `json:"google,omitempty"`
+			Oracle  *oracle.Cluster                `json:"oracle,omitempty"`
 		}{
 			Google: &google.ClusterProfileGoogle{
 				Master: &google.Master{
@@ -132,10 +134,11 @@ var (
 		Location: location,
 		Cloud:    pkgCluster.Azure,
 		Properties: struct {
-			Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
-			Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
-			Google *google.ClusterProfileGoogle `json:"google,omitempty"`
-			Oracle *oracle.Cluster              `json:"oracle,omitempty"`
+			Alibaba *alibaba.ClusterProfileAlibaba `json:"alibaba,omitempty"`
+			Amazon  *amazon.ClusterProfileAmazon   `json:"amazon,omitempty"`
+			Azure   *azure.ClusterProfileAzure     `json:"azure,omitempty"`
+			Google  *google.ClusterProfileGoogle   `json:"google,omitempty"`
+			Oracle  *oracle.Cluster                `json:"oracle,omitempty"`
 		}{
 			Azure: &azure.ClusterProfileAzure{
 				KubernetesVersion: k8sVersion,
@@ -154,10 +157,11 @@ var (
 		Location: location,
 		Cloud:    pkgCluster.Amazon,
 		Properties: struct {
-			Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
-			Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
-			Google *google.ClusterProfileGoogle `json:"google,omitempty"`
-			Oracle *oracle.Cluster              `json:"oracle,omitempty"`
+			Alibaba *alibaba.ClusterProfileAlibaba `json:"alibaba,omitempty"`
+			Amazon  *amazon.ClusterProfileAmazon   `json:"amazon,omitempty"`
+			Azure   *azure.ClusterProfileAzure     `json:"azure,omitempty"`
+			Google  *google.ClusterProfileGoogle   `json:"google,omitempty"`
+			Oracle  *oracle.Cluster                `json:"oracle,omitempty"`
 		}{
 			Amazon: &amazon.ClusterProfileAmazon{
 				Master: &amazon.ProfileMaster{
@@ -232,10 +236,11 @@ var (
 		Location: location,
 		Cloud:    pkgCluster.Google,
 		Properties: struct {
-			Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
-			Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
-			Google *google.ClusterProfileGoogle `json:"google,omitempty"`
-			Oracle *oracle.Cluster              `json:"oracle,omitempty"`
+			Alibaba *alibaba.ClusterProfileAlibaba `json:"alibaba,omitempty"`
+			Amazon  *amazon.ClusterProfileAmazon   `json:"amazon,omitempty"`
+			Azure   *azure.ClusterProfileAzure     `json:"azure,omitempty"`
+			Google  *google.ClusterProfileGoogle   `json:"google,omitempty"`
+			Oracle  *oracle.Cluster                `json:"oracle,omitempty"`
 		}{
 			Google: &google.ClusterProfileGoogle{
 				Master: &google.Master{
@@ -250,10 +255,11 @@ var (
 		Location: location,
 		Cloud:    pkgCluster.Amazon,
 		Properties: struct {
-			Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
-			Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
-			Google *google.ClusterProfileGoogle `json:"google,omitempty"`
-			Oracle *oracle.Cluster              `json:"oracle,omitempty"`
+			Alibaba *alibaba.ClusterProfileAlibaba `json:"alibaba,omitempty"`
+			Amazon  *amazon.ClusterProfileAmazon   `json:"amazon,omitempty"`
+			Azure   *azure.ClusterProfileAzure     `json:"azure,omitempty"`
+			Google  *google.ClusterProfileGoogle   `json:"google,omitempty"`
+			Oracle  *oracle.Cluster                `json:"oracle,omitempty"`
 		}{
 			Amazon: &amazon.ClusterProfileAmazon{
 				Master: &amazon.ProfileMaster{
@@ -284,10 +290,11 @@ var (
 		Location: location,
 		Cloud:    pkgCluster.Google,
 		Properties: struct {
-			Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
-			Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
-			Google *google.ClusterProfileGoogle `json:"google,omitempty"`
-			Oracle *oracle.Cluster              `json:"oracle,omitempty"`
+			Alibaba *alibaba.ClusterProfileAlibaba `json:"alibaba,omitempty"`
+			Amazon  *amazon.ClusterProfileAmazon   `json:"amazon,omitempty"`
+			Azure   *azure.ClusterProfileAzure     `json:"azure,omitempty"`
+			Google  *google.ClusterProfileGoogle   `json:"google,omitempty"`
+			Oracle  *oracle.Cluster                `json:"oracle,omitempty"`
 		}{
 			Google: &google.ClusterProfileGoogle{
 				NodeVersion: version,
@@ -306,10 +313,11 @@ var (
 		Location: location,
 		Cloud:    pkgCluster.Amazon,
 		Properties: struct {
-			Amazon *amazon.ClusterProfileAmazon `json:"amazon,omitempty"`
-			Azure  *azure.ClusterProfileAzure   `json:"azure,omitempty"`
-			Google *google.ClusterProfileGoogle `json:"google,omitempty"`
-			Oracle *oracle.Cluster              `json:"oracle,omitempty"`
+			Alibaba *alibaba.ClusterProfileAlibaba `json:"alibaba,omitempty"`
+			Amazon  *amazon.ClusterProfileAmazon   `json:"amazon,omitempty"`
+			Azure   *azure.ClusterProfileAzure     `json:"azure,omitempty"`
+			Google  *google.ClusterProfileGoogle   `json:"google,omitempty"`
+			Oracle  *oracle.Cluster                `json:"oracle,omitempty"`
 		}{
 			Amazon: &amazon.ClusterProfileAmazon{
 				NodePools: map[string]*amazon.NodePool{

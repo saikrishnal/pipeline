@@ -418,8 +418,6 @@ func waitForClusterState(client *cs.Client, clusterID string) (*alibabaDescribeC
 			time.Sleep(time.Second * 5)
 		}
 	}
-
-	return r, errors.New("unreachable code")
 }
 
 func (c *AlibabaCluster) Persist(status, statusMessage string) error {
