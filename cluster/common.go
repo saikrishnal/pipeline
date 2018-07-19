@@ -195,6 +195,19 @@ func GetCommonClusterFromModel(modelCluster *model.ClusterModel) (CommonCluster,
 
 	cloudType := modelCluster.Cloud
 	switch cloudType {
+	case pkgCluster.Alibaba:
+		//Create Alibaba struct
+		alibabaCluster, err := CreateAlibabaClusterFromModel(modelCluster)
+		if err != nil {
+			return nil, err
+		}
+
+		log.Debug("Load Alibaba props from database")
+		database.Where(model.AlibabaClusterModel{ClusterModelId: alibabaCluster.modelCluster.ID}).First(&alibabaCluster.modelCluster.Alibaba)
+		database.Model(&alibabaCluster.modelCluster.Alibaba).Related(&alibabaCluster.modelCluster.Alibaba.NodePools, "NodePools")
+
+		return alibabaCluster, nil
+
 	case pkgCluster.Amazon:
 		//Create Amazon struct
 		awsCluster, err := CreateAWSClusterFromModel(modelCluster)

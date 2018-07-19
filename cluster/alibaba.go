@@ -20,6 +20,7 @@ import (
 	"github.com/banzaicloud/pipeline/model"
 	pkgCluster "github.com/banzaicloud/pipeline/pkg/cluster"
 	"github.com/banzaicloud/pipeline/pkg/cluster/alibaba"
+	pkgCommon "github.com/banzaicloud/pipeline/pkg/common"
 	pkgErrors "github.com/banzaicloud/pipeline/pkg/errors"
 	"github.com/banzaicloud/pipeline/secret"
 	"github.com/banzaicloud/pipeline/secret/verify"
@@ -147,6 +148,10 @@ func (*AlibabaCluster) RequiresSshPublicKey() bool {
 	return true
 }
 
+func (*AlibabaCluster) ListNodeNames() (pkgCommon.NodeNames, error) {
+	return nil, nil
+}
+
 // GetAlibabaCSClient creates an Alibaba Container Service client with the credentials
 func (c *AlibabaCluster) GetAlibabaCSClient(cfg *sdk.Config) (*cs.Client, error) {
 	cred, err := c.createAlibabaCredentialsFromSecret()
@@ -187,6 +192,15 @@ func createAlibabaNodePoolsModelFromRequestData(pools alibaba.NodePools) ([]*mod
 	}
 
 	return res, nil
+}
+
+//CreateAlibabaClusterFromModel creates ClusterModel struct from the Alibaba model
+func CreateAlibabaClusterFromModel(clusterModel *model.ClusterModel) (*AlibabaCluster, error) {
+	log.Debug("Create ClusterModel struct from the model")
+	alibabaCluster := AlibabaCluster{
+		modelCluster: clusterModel,
+	}
+	return &alibabaCluster, nil
 }
 
 func CreateAlibabaClusterFromRequest(request *pkgCluster.CreateClusterRequest, orgId uint) (*AlibabaCluster, error) {
@@ -416,11 +430,11 @@ func (c *AlibabaCluster) Persist(status, statusMessage string) error {
 }
 
 func (c *AlibabaCluster) DownloadK8sConfig() ([]byte, error) {
-	client, err := cs.NewClientWithAccessKey(
-		"eu-central-1",                   // Your Region ID
-		"LTAIEeTgEJPVfa3P",               // Your AccessKey ID
-		"Dzt2bGLSbXyziAdARN91VwD2Qgn3nS", // Your AccessKey Secret
-	)
+	cfg := sdk.NewConfig()
+	cfg.AutoRetry = false
+	cfg.Debug = true
+	cfg.Timeout = time.Minute
+	client, err := c.GetAlibabaCSClient(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -495,9 +509,8 @@ func (c *AlibabaCluster) GetStatus() (*pkgCluster.GetClusterStatusResponse, erro
 	for _, np := range c.modelCluster.Google.NodePools {
 		if np != nil {
 			nodePools[np.Name] = &pkgCluster.NodePoolStatus{
-				Count:          np.NodeCount,
-				InstanceType:   np.NodeInstanceType,
-				ServiceAccount: np.ServiceAccount,
+				Count:        np.NodeCount,
+				InstanceType: np.NodeInstanceType,
 			}
 		}
 	}
@@ -543,7 +556,7 @@ func (c *AlibabaCluster) DeleteCluster() error {
 	return nil
 }
 
-func (c *AlibabaCluster) UpdateCluster(*pkgCluster.UpdateClusterRequest) error {
+func (c *AlibabaCluster) UpdateCluster(request *pkgCluster.UpdateClusterRequest, userId uint) error {
 	log.Info("Start updating cluster (alibaba)")
 
 	client, err := c.GetAlibabaCSClient(nil)
@@ -642,7 +655,7 @@ func (c *AlibabaCluster) UpdateStatus(status, statusMessage string) error {
 	return c.modelCluster.UpdateStatus(status, statusMessage)
 }
 
-func (c *AlibabaCluster) GetClusterDetails() (*pkgCluster.ClusterDetailsResponse, error) {
+func (c *AlibabaCluster) GetClusterDetails() (*pkgCluster.DetailsResponse, error) {
 	client, err := c.GetAlibabaCSClient(nil)
 	if err != nil {
 		return nil, err
@@ -656,7 +669,7 @@ func (c *AlibabaCluster) GetClusterDetails() (*pkgCluster.ClusterDetailsResponse
 		return nil, pkgErrors.ErrorClusterNotReady
 	}
 
-	return &pkgCluster.ClusterDetailsResponse{
+	return &pkgCluster.DetailsResponse{
 		Name: r.Name,
 		Id:   c.modelCluster.ID,
 	}, nil
