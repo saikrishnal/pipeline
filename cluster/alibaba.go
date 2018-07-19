@@ -1,9 +1,7 @@
 package cluster
 
 import (
-	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -26,8 +24,6 @@ import (
 	"github.com/banzaicloud/pipeline/secret/verify"
 	"github.com/jmespath/go-jmespath"
 	"github.com/pkg/errors"
-	"github.com/pkg/sftp"
-	"golang.org/x/crypto/ssh"
 )
 
 const (
@@ -113,9 +109,10 @@ type obtainClusterConfigResponse struct {
 	*responses.BaseResponse
 }
 
-func createObtainClusterConfigRequest() (request *obtainClusterConfigRequest) {
+func createObtainClusterConfigRequest(clusterID string) (request *obtainClusterConfigRequest) {
 	request = &obtainClusterConfigRequest{
 		RoaRequest: &requests.RoaRequest{},
+		ClusterId:  clusterID,
 	}
 	request.InitWithApiInfo("CS", "2015-12-15", "UserConfig", "/k8s/[ClusterId]/user_config", "", "")
 	request.Method = requests.GET
@@ -129,7 +126,7 @@ func createObtainClusterConfigResponse() (response *obtainClusterConfigResponse)
 	return
 }
 
-type clusterCreateResponse struct {
+type clusterConfigResponse struct {
 	Config string `json:"config"`
 }
 
@@ -309,7 +306,8 @@ func (c *AlibabaCluster) CreateCluster() error {
 	}
 	c.alibabaCluster = aliCluster
 
-	return nil
+	c.modelCluster.Alibaba.ClusterID = r.ClusterID
+	return c.modelCluster.Save()
 }
 
 type setSchemeSetDomainer interface {
@@ -355,7 +353,7 @@ type alibabaConnectionInfo struct {
 	InternetURI string
 }
 
-func getConnectionInfo(client *cs.Client, clusterID string) (inf *alibabaConnectionInfo, err error) {
+func getConnectionInfo(client *cs.Client, clusterID string) (inf alibabaConnectionInfo, err error) {
 	details, err := getClusterDetails(client, clusterID)
 	if err != nil {
 		return
@@ -434,64 +432,29 @@ func (c *AlibabaCluster) DownloadK8sConfig() ([]byte, error) {
 	cfg.AutoRetry = false
 	cfg.Debug = true
 	cfg.Timeout = time.Minute
-	client, err := c.GetAlibabaCSClient(cfg)
+
+	ecsClient, err := c.GetAlibabaECSClient(cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	clusterInfo, err := getConnectionInfo(client, c.alibabaCluster.ClusterID)
+	downloadConfigRequest := createObtainClusterConfigRequest(c.modelCluster.Alibaba.ClusterID)
+	setEndpoint(downloadConfigRequest)
+
+	downloadConfigResponse := createObtainClusterConfigResponse()
+
+	err = ecsClient.DoAction(downloadConfigRequest, downloadConfigResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	sshConfig := &ssh.ClientConfig{
-		User:            "root",
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
-	remotePath := "/root/.kube/config"
-
-	clusterSshSecret, err := c.GetSshSecretWithValidation()
+	var config clusterConfigResponse
+	err = json.Unmarshal(downloadConfigResponse.GetHttpContentBytes(), &config)
 	if err != nil {
 		return nil, err
 	}
 
-	sshKey := secret.NewSSHKeyPair(clusterSshSecret)
-	pemBytes := []byte(sshKey.PrivateKeyData)
-
-	signer, err := getSigner(pemBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	auths := []ssh.AuthMethod{
-		ssh.PublicKeys(signer),
-	}
-	sshConfig.Auth = auths
-	sshConfig.SetDefaults()
-
-	address := clusterInfo.JumpHost + ":22"
-	connection, err := ssh.Dial("tcp", address, sshConfig)
-	if err != nil {
-		return nil, err
-	}
-	defer connection.Close()
-	sftpClient, err := sftp.NewClient(connection)
-	if err != nil {
-		return nil, err
-	}
-	defer sftpClient.Close()
-	sftpConnection, err := sftpClient.Open(remotePath)
-	if err != nil {
-		return nil, err
-	}
-	defer sftpConnection.Close()
-	config, err := ioutil.ReadAll(sftpConnection)
-	if err != nil {
-		return nil, err
-	}
-
-	config = bytes.Replace(config, []byte(clusterInfo.IntranetURI), []byte(clusterInfo.InternetURI), -1)
-	return config, nil
+	return []byte(config.Config), err
 }
 
 func (c *AlibabaCluster) GetName() string {

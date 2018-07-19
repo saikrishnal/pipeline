@@ -70,6 +70,7 @@ type AlibabaNodePoolModel struct {
 // AlibabaClusterModel describes the Alibaba cluster model
 type AlibabaClusterModel struct {
 	ClusterModelId           uint `gorm:"primary_key"`
+	ClusterID                string
 	RegionID                 string
 	ZoneID                   string
 	MasterInstanceType       string
