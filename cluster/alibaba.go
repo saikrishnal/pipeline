@@ -143,6 +143,10 @@ type AlibabaCluster struct {
 	CommonClusterBase
 }
 
+func (*AlibabaCluster) RequiresSshPublicKey() bool {
+	return true
+}
+
 // GetAlibabaCSClient creates an Alibaba Container Service client with the credentials
 func (c *AlibabaCluster) GetAlibabaCSClient(cfg *sdk.Config) (*cs.Client, error) {
 	cred, err := c.createAlibabaCredentialsFromSecret()
@@ -150,7 +154,7 @@ func (c *AlibabaCluster) GetAlibabaCSClient(cfg *sdk.Config) (*cs.Client, error)
 		return nil, err
 	}
 
-	return verify.CreateAlibabaCSClient(cred, c.alibabaCluster.RegionID, cfg)
+	return verify.CreateAlibabaCSClient(cred, c.modelCluster.Alibaba.RegionID, cfg)
 }
 
 // GetAlibabaECSClient creates an Alibaba Elastic Compute Service client with the credentials
@@ -160,7 +164,7 @@ func (c *AlibabaCluster) GetAlibabaECSClient(cfg *sdk.Config) (*ecs.Client, erro
 		return nil, err
 	}
 
-	return verify.CreateAlibabaECSClient(cred, c.alibabaCluster.RegionID, cfg)
+	return verify.CreateAlibabaECSClient(cred, c.modelCluster.Alibaba.RegionID, cfg)
 }
 
 func createAlibabaNodePoolsModelFromRequestData(pools alibaba.NodePools) ([]*model.AlibabaNodePoolModel, error) {
@@ -234,7 +238,6 @@ func (c *AlibabaCluster) CreateCluster() error {
 	}
 
 	sshKey := secret.NewSSHKeyPair(clusterSshSecret)
-	// TODO: remove me
 	_ = sshKey
 
 	// setup cluster creation request
@@ -250,7 +253,7 @@ func (c *AlibabaCluster) CreateCluster() error {
 		WorkerSystemDiskCategory: c.modelCluster.Alibaba.NodePools[0].WorkerSystemDiskCategory, // "cloud_efficiency",
 		WorkerSystemDiskSize:     c.modelCluster.Alibaba.NodePools[0].WorkerSystemDiskSize,     // 40,
 		LoginPassword:            c.modelCluster.Alibaba.LoginPassword,                         // TODO: change me to KeyPair
-		//KeyPair:                  sshKey.PublicKeyData,
+		// KeyPair:                  sshKey.PublicKeyData, // this one should be a keypair name, so keypair should be uploaded
 		ImageID:    c.modelCluster.Alibaba.NodePools[0].ImageID,    // "centos_7",
 		NumOfNodes: c.modelCluster.Alibaba.NodePools[0].NumOfNodes, // 1,
 		SNATEntry:  c.modelCluster.Alibaba.SNATEntry,               // true,

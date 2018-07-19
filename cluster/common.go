@@ -105,7 +105,7 @@ func (c *CommonClusterBase) getSshSecret(cluster CommonCluster) (*secret.SecretI
 		log.Info("Ssh secret is nil.. load from vault")
 		s, err := getSecret(cluster.GetOrganizationId(), cluster.GetSshSecretId())
 		if err != nil {
-			log.Errorf("Get ssh key failed OrganizationID: %q, SshSecretID: %q  reason: %s", cluster.GetOrganizationId(), cluster.GetSshSecretId, err.Error())
+			log.Errorf("Get ssh key failed OrganizationID: %d, SshSecretID: %s reason: %s", cluster.GetOrganizationId(), cluster.GetSshSecretId(), err.Error())
 			return nil, err
 		}
 		c.sshSecret = s
