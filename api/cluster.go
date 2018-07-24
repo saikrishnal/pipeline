@@ -990,7 +990,8 @@ func getResourceSummary(capacity, allocatable, requests, limits map[v1.ResourceN
 	var limitCPU string
 
 	if cpu, ok := capacity[v1.ResourceCPU]; ok {
-		capCPU = cpu.String()
+		//capCPU = cpu.String()
+		capCPU = formatCPUQuantity(&cpu)
 	}
 
 	if memory, ok := capacity[v1.ResourceMemory]; ok {
@@ -998,7 +999,8 @@ func getResourceSummary(capacity, allocatable, requests, limits map[v1.ResourceN
 	}
 
 	if cpu, ok := allocatable[v1.ResourceCPU]; ok {
-		allCPU = cpu.String()
+		//allCPU = cpu.String()
+		allCPU = formatCPUQuantity(&cpu)
 	}
 
 	if memory, ok := allocatable[v1.ResourceMemory]; ok {
@@ -1006,7 +1008,8 @@ func getResourceSummary(capacity, allocatable, requests, limits map[v1.ResourceN
 	}
 
 	if value, ok := requests[v1.ResourceCPU]; ok {
-		reqCPU = value.String()
+		//reqCPU = value.String()
+		reqCPU = formatCPUQuantity(&value)
 	}
 
 	if value, ok := requests[v1.ResourceMemory]; ok {
@@ -1014,7 +1017,8 @@ func getResourceSummary(capacity, allocatable, requests, limits map[v1.ResourceN
 	}
 
 	if value, ok := limits[v1.ResourceCPU]; ok {
-		limitCPU = value.String()
+		//limitCPU = value.String()
+		limitCPU = formatCPUQuantity(&value)
 	}
 
 	if value, ok := limits[v1.ResourceMemory]; ok {
@@ -1039,6 +1043,30 @@ func getResourceSummary(capacity, allocatable, requests, limits map[v1.ResourceN
 			},
 		},
 	}
+}
+
+func formatCPUQuantity(q *resource.Quantity) string {
+
+	result := make([]byte, 0, 18)
+	number, suffix := q.CanonicalizeBytes(result)
+	if string(suffix) == "m" {
+		// the suffix m to mean mili. For example 100m cpu is 100 milicpu, and is the same as 0.1 cpu.
+		i, err := strconv.Atoi(string(number))
+		if err != nil {
+			log.Warnf("error during formatting quantity")
+			return q.String()
+		}
+
+		if i < 1000 {
+			return fmt.Sprintf("%s mCPU", string(number))
+		}
+
+		f := float64(i) / 1000
+		return fmt.Sprintf("%.2f CPU", f)
+	} else {
+		return fmt.Sprintf("%s CPU", string(number))
+	}
+
 }
 
 func getAllPodsRequestsAndLimitsInAllNamespace(client *kubernetes.Clientset, fieldSelector string) (map[v1.ResourceName]resource.Quantity, map[v1.ResourceName]resource.Quantity, error) {
