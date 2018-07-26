@@ -168,6 +168,7 @@
     "service/cloudformation",
     "service/ec2",
     "service/eks",
+    "service/elb",
     "service/iam",
     "service/iam/iamiface",
     "service/route53",
@@ -1910,6 +1911,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6d1ce78e59a96c5e5bceb9337347d4c678d1df4cfbbd7f31ba7d4046b5dc63ac"
+  inputs-digest = "409124700b294021733c13b713c5e605469b598ae58e3720bf0ac5e88b009279"
   solver-name = "gps-cdcl"
   solver-version = 1
